@@ -52,12 +52,12 @@ func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) error {
 	if err != nil {
 		return err
 	}
-	stmt, err := tx.Prepare("insert into transaction(account_id, amount, event_date, operation_type) values (?,?,?,?)")
+	stmt, err := tx.Prepare("insert into [transaction](account_id, amount, event_date, operation_type) values (?,?,?,?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(transaction.AccountID, transaction.Amount, time.Now(), transaction.OperationTypeID)
+	_, err = stmt.Exec(transaction.AccountID, transaction.Amount, time.Now().Format(time.RFC3339), transaction.OperationTypeID)
 	if err != nil {
 		tx.Rollback()
 		return err
