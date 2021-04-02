@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/Fuerback/transactions-go/controller"
+	"github.com/Fuerback/transactions-go/router"
+)
+
+var (
+	httpRouter            router.Router                    = router.NewMuxRouter()
+	transactionController controller.TransactionController = controller.NewTransactionController()
+	accountController     controller.AccountController     = controller.NewAccountController()
 )
 
 func main() {
-	var router = mux.NewRouter()
-
 	const port string = ":8000"
 
-	router.HandleFunc("/", func(resp http.ResponseWriter, r *http.Request) {
+	httpRouter.GET("/", func(resp http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(resp, "Server up and running...")
 	})
-	router.HandleFunc("/account", getAccount).Methods("GET")
-	router.HandleFunc("/account", createAccount).Methods("POST")
-	router.HandleFunc("/transaction", createTransaction).Methods("POST")
+	httpRouter.GET("/account", accountController.FindAccount)
+	httpRouter.POST("/account", accountController.CreateAccount)
+	httpRouter.POST("/transaction", transactionController.CreateTransaction)
 
-	log.Println("server listining on port", port)
-	log.Fatalln(http.ListenAndServe(port, router))
+	httpRouter.SERVE(port)
 }
