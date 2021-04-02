@@ -5,6 +5,7 @@ import (
 
 	"github.com/Fuerback/transactions-go/dto"
 	"github.com/Fuerback/transactions-go/entity"
+	"github.com/Fuerback/transactions-go/repository"
 )
 
 type TransactionService interface {
@@ -14,23 +15,24 @@ type TransactionService interface {
 type transactionService struct{}
 
 var (
-	createTransactionParser CreateTransactionParser
-	transactions            []entity.Transaction
+	transactionParser TransactionParser
+	repo1             repository.Repository
+	transactions      []entity.Transaction
 )
 
 func init() {
 	transactions = []entity.Transaction{}
 }
 
-func NewTransactionService() TransactionService {
+func NewTransactionService(r repository.Repository) TransactionService {
+	repo = r
 	return &transactionService{}
 }
 
 func (s *transactionService) Create(transaction *dto.CreateTransaction) error {
-	entity, err := createTransactionParser.ParseMessageToDomain(transaction)
+	err := repo.CreateTransaction(transaction)
 	if err != nil {
-		return errors.New("Error parsing CreateTransactionDTO to transaction entity")
+		return errors.New("Error creating new transaction in database")
 	}
-	transactions = append(transactions, entity)
 	return nil
 }

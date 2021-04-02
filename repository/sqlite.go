@@ -31,17 +31,17 @@ func (s *sqlite) CreateAccount(account *dto.CreateAccount) error {
 	return nil
 }
 
-func (s *sqlite) FindAccount(account *dto.FindAccount) (*entity.Account, error) {
-	u := new(entity.Account)
+func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
+	u := entity.Account{}
 
-	stmt, err := s.DB.Prepare("select * from account where id = ? and document_number = ?")
+	stmt, err := s.DB.Prepare("select * from account where id = ?")
 	if err != nil {
-		return nil, err
+		return entity.Account{}, err
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(account.ID, account.DocumentNumber).Scan(u.ID, u.DocumentNumber)
+	err = stmt.QueryRow(ID).Scan(&u.ID, &u.DocumentNumber)
 	if err != nil {
-		return nil, err
+		return entity.Account{}, err
 	}
 
 	return u, nil

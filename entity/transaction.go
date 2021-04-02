@@ -5,7 +5,7 @@ import (
 )
 
 type Account struct {
-	ID             int
+	ID             int64
 	DocumentNumber string
 }
 

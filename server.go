@@ -1,31 +1,40 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Fuerback/transactions-go/controller"
+	"github.com/Fuerback/transactions-go/repository"
 	"github.com/Fuerback/transactions-go/router"
 	"github.com/Fuerback/transactions-go/service"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-var (
-	// criar repository aqui e passar pros serviços
-	httpRouter router.Router = router.NewMuxRouter()
-	//repository            repository.Repository            = repository.NewSqlite()
-	transactionService    service.TransactionService       = service.NewTransactionService()
-	accountService        service.AccountService           = service.NewAccountService()
-	transactionController controller.TransactionController = controller.NewTransactionController(transactionService)
-	accountController     controller.AccountController     = controller.NewAccountController(accountService)
-)
+const port string = ":8000"
 
 func main() {
-	const port string = ":8000"
+	db, err := sql.Open("sqlite3", "db/transaction.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	sqliteRepo := repository.NewSqlite(db)
+
+	httpRouter := router.NewMuxRouter()
+
+	transactionService := service.NewTransactionService(sqliteRepo)
+	accountService := service.NewAccountService(sqliteRepo)
+
+	transactionController := controller.NewTransactionController(transactionService)
+	accountController := controller.NewAccountController(accountService)
 
 	httpRouter.GET("/", func(resp http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(resp, "Server up and running...")
 	})
-	httpRouter.GET("/account", accountController.FindAccount)
+	httpRouter.GET("/account/{id}", accountController.FindAccount)
 	httpRouter.POST("/account", accountController.CreateAccount)
 	httpRouter.POST("/transaction", transactionController.CreateTransaction)
 

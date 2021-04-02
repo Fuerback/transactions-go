@@ -4,39 +4,39 @@ import (
 	"errors"
 
 	"github.com/Fuerback/transactions-go/dto"
-	"github.com/Fuerback/transactions-go/entity"
+	"github.com/Fuerback/transactions-go/repository"
 )
 
 type AccountService interface {
-	Find(account *dto.FindAccount) ([]entity.Account, error)
+	Find(ID int64) (dto.Account, error)
 	Create(account *dto.CreateAccount) error
 }
 
 type accountService struct{}
 
 var (
-	createAccountParser CreateAccountParser
-	accounts            []entity.Account
+	accountParser AccountParser
+	repo          repository.Repository
 )
 
-func init() {
-	accounts = []entity.Account{}
-}
-
-func NewAccountService() AccountService {
+func NewAccountService(r repository.Repository) AccountService {
+	repo = r
 	return &accountService{}
 }
 
-func (s *accountService) Find(account *dto.FindAccount) ([]entity.Account, error) {
-	// find account in db
-	return accounts, nil
+func (s *accountService) Find(ID int64) (dto.Account, error) {
+	account, err := repo.FindAccount(ID)
+	if err != nil {
+		return dto.Account{}, err
+	}
+	accountDTO, _ := accountParser.ParseDomainToMessage(account)
+	return accountDTO, nil
 }
 
 func (s *accountService) Create(account *dto.CreateAccount) error {
-	entity, err := createAccountParser.ParseMessageToDomain(account)
+	err := repo.CreateAccount(account)
 	if err != nil {
-		return errors.New("Error parsing CreateAccountDTO to account entity")
+		return errors.New("Error creating new account in database")
 	}
-	accounts = append(accounts, entity)
 	return nil
 }

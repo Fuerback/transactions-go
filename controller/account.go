@@ -1,12 +1,15 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Fuerback/transactions-go/dto"
 	"github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
+	"github.com/gorilla/mux"
 )
 
 var accountService service.AccountService
@@ -41,17 +44,22 @@ func (a *accountController) CreateAccount(resp http.ResponseWriter, r *http.Requ
 }
 
 func (a *accountController) FindAccount(resp http.ResponseWriter, r *http.Request) {
-	resp.Header().Set("Content-type", "application/json")
-	accountDTO := new(dto.FindAccount)
-	err := json.NewDecoder(r.Body).Decode(accountDTO)
+	vars := mux.Vars(r)
+	ID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(`{"error": "error unmarshalling the request"}`))
+		resp.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
-	accounts, err := accountService.Find(accountDTO)
+
+	resp.Header().Set("Content-type", "application/json")
+	accounts, err := accountService.Find(ID)
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
+		if err == sql.ErrNoRows {
+			resp.WriteHeader(http.StatusBadRequest)
+		} else {
+			resp.WriteHeader(http.StatusInternalServerError)
+		}
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}

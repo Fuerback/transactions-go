@@ -9,7 +9,7 @@ import (
 
 type Repository interface {
 	CreateAccount(account *dto.CreateAccount) error
-	FindAccount(account *dto.FindAccount) (*entity.Account, error)
+	FindAccount(ID int64) (entity.Account, error)
 	CreateTransaction(transaction *dto.CreateTransaction) error
 }
 

@@ -4,8 +4,8 @@ type CreateAccount struct {
 	DocumentNumber string `json:"document_number"`
 }
 
-type FindAccount struct {
-	ID             int    `json:"account_id"`
+type Account struct {
+	ID             int64  `json:"account_id"`
 	DocumentNumber string `json:"document_number"`
 }
 
