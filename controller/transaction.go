@@ -9,7 +9,7 @@ import (
 	"github.com/Fuerback/transactions-go/service"
 )
 
-var transactionService service.TransactionService = service.NewTransactionService()
+var transactionService service.TransactionService
 
 type TransactionController interface {
 	CreateTransaction(resp http.ResponseWriter, r *http.Request)
@@ -17,7 +17,8 @@ type TransactionController interface {
 
 type transactionController struct{}
 
-func NewTransactionController() TransactionController {
+func NewTransactionController(service service.TransactionService) TransactionController {
+	transactionService = service
 	return &transactionController{}
 }
 

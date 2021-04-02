@@ -9,7 +9,7 @@ import (
 	"github.com/Fuerback/transactions-go/service"
 )
 
-var accountService service.AccountService = service.NewAccountService()
+var accountService service.AccountService
 
 type AccountController interface {
 	CreateAccount(resp http.ResponseWriter, r *http.Request)
@@ -18,7 +18,8 @@ type AccountController interface {
 
 type accountController struct{}
 
-func NewAccountController() AccountController {
+func NewAccountController(service service.AccountService) AccountController {
+	accountService = service
 	return &accountController{}
 }
 

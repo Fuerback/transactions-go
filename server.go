@@ -6,12 +6,16 @@ import (
 
 	"github.com/Fuerback/transactions-go/controller"
 	"github.com/Fuerback/transactions-go/router"
+	"github.com/Fuerback/transactions-go/service"
 )
 
 var (
+	// criar repository aqui e passar pros serviços
 	httpRouter            router.Router                    = router.NewMuxRouter()
-	transactionController controller.TransactionController = controller.NewTransactionController()
-	accountController     controller.AccountController     = controller.NewAccountController()
+	transactionService    service.TransactionService       = service.NewTransactionService()
+	accountService        service.AccountService           = service.NewAccountService()
+	transactionController controller.TransactionController = controller.NewTransactionController(transactionService)
+	accountController     controller.AccountController     = controller.NewAccountController(accountService)
 )
 
 func main() {

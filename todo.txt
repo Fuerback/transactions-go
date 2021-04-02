@@ -1,1 +1,5 @@
 - validar json de entrada
+- criar implementação do db
+- testes unitarios
+- testes de integração
+- docker
