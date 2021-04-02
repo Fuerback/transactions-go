@@ -11,7 +11,8 @@ import (
 
 var (
 	// criar repository aqui e passar pros serviços
-	httpRouter            router.Router                    = router.NewMuxRouter()
+	httpRouter router.Router = router.NewMuxRouter()
+	//repository            repository.Repository            = repository.NewSqlite()
 	transactionService    service.TransactionService       = service.NewTransactionService()
 	accountService        service.AccountService           = service.NewAccountService()
 	transactionController controller.TransactionController = controller.NewTransactionController(transactionService)
