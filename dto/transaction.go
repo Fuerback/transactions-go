@@ -10,14 +10,14 @@ type Account struct {
 }
 
 type CreateTransaction struct {
-	AccountID       int     `json:"account_id" validate:"required"`
+	AccountID       int64   `json:"account_id" validate:"required"`
 	OperationTypeID int     `json:"operation_type_id" validate:"required"`
 	Amount          float64 `json:"amount" validate:"required"`
 }
 
 type Transaction struct {
 	ID              int64
-	AccountID       int
+	AccountID       int64
 	OperationTypeID int
 	Amount          float64
 }
