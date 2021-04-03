@@ -1,7 +1,3 @@
-- testes unitarios
-- testes de integração
-- docker
-
 CREATE TABLE account (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     document_number TEXT    NOT NULL
