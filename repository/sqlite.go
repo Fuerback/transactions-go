@@ -9,10 +9,12 @@ import (
 	"github.com/Fuerback/transactions-go/entity"
 )
 
-type sqlite struct{}
+type sqlite struct {
+	DBFilePath string
+}
 
 func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
-	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +40,7 @@ func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
 }
 
 func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
-	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +62,7 @@ func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
 }
 
 func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) (int64, error) {
-	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,4 +85,21 @@ func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) (int64, e
 	ID, _ := result.LastInsertId()
 	tx.Commit()
 	return ID, nil
+}
+
+func (s *sqlite) ClearUp() error {
+	db, err := sql.Open("sqlite3", s.DBFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("delete from [transaction]")
+	_, err = tx.Exec("delete from account")
+	tx.Commit()
+	return err
 }

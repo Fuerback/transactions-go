@@ -9,8 +9,9 @@ type Repository interface {
 	CreateAccount(account *dto.CreateAccount) (int64, error)
 	FindAccount(ID int64) (entity.Account, error)
 	CreateTransaction(transaction *dto.CreateTransaction) (int64, error)
+	ClearUp() error
 }
 
-func NewSqlite() Repository {
-	return &sqlite{}
+func NewSqlite(dbFilePath string) Repository {
+	return &sqlite{DBFilePath: dbFilePath}
 }

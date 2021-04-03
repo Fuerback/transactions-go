@@ -41,7 +41,11 @@ func (c *transactionController) CreateTransaction(resp http.ResponseWriter, r *h
 	}
 	transaction, err := transactionService.Create(transactionDTO)
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
+		if err == errors.ErrInvalidOperation {
+			resp.WriteHeader(http.StatusBadRequest)
+		} else {
+			resp.WriteHeader(http.StatusInternalServerError)
+		}
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}

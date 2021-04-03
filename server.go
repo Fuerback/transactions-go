@@ -14,7 +14,7 @@ import (
 const port string = ":8000"
 
 func main() {
-	sqliteRepo := repository.NewSqlite()
+	sqliteRepo := repository.NewSqlite("db/transaction.db?_foreign_keys=on")
 
 	httpRouter := router.NewMuxRouter()
 
