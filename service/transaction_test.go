@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/Fuerback/transactions-go/dto"
@@ -31,7 +32,7 @@ func (ref *transactionSuite) SetupTest() {
 }
 
 func (ref *transactionSuite) TestCreateTransaction_Success() {
-	t := getCreateTransactionDTO()
+	t := getCreateTransactionDTO(2)
 
 	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
 
@@ -43,10 +44,63 @@ func (ref *transactionSuite) TestCreateTransaction_Success() {
 	ref.Equal(transaction.AccountID, id)
 }
 
-func getCreateTransactionDTO() *dto.CreateTransaction {
+func (ref *transactionSuite) TestCreateTransactionNegativeAmount_Success() {
+
+	i := 1
+	for i <= 3 {
+		t := getCreateTransactionDTO(i)
+
+		ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+
+		transaction, err := ref.service.Create(t)
+		ref.NoError(err)
+		ref.NotNil(transaction)
+		ref.Equal(transaction.ID, id)
+		ref.Negative(transaction.Amount)
+		i++
+	}
+
+}
+
+func (ref *transactionSuite) TestCreateTransactionPositiveAmount_Success() {
+
+	t := getCreateTransactionDTO(4)
+
+	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+
+	transaction, err := ref.service.Create(t)
+	ref.NoError(err)
+	ref.NotNil(transaction)
+	ref.Equal(transaction.ID, id)
+	ref.Positive(transaction.Amount)
+
+}
+
+func (ref *transactionSuite) TestCreateTransactionInvalidOperation() {
+
+	t := getCreateTransactionDTO(5)
+
+	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+
+	_, err := ref.service.Create(t)
+	ref.Error(err)
+}
+
+func (ref *transactionSuite) TestCreateTransactionErrorOnPersist() {
+
+	t := getCreateTransactionDTO(1)
+	fakeErr := errors.New("some error")
+
+	ref.repo.On("CreateTransaction", t).Return(id, fakeErr).Once()
+
+	_, err := ref.service.Create(t)
+	ref.Error(err)
+}
+
+func getCreateTransactionDTO(operation int) *dto.CreateTransaction {
 	return &dto.CreateTransaction{
 		AccountID:       id,
-		OperationTypeID: 2,
+		OperationTypeID: operation,
 		Amount:          120.56,
 	}
 }

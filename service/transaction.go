@@ -38,7 +38,7 @@ func (s *transactionService) Create(t *dto.CreateTransaction) (dto.Transaction, 
 	if err != nil {
 		return dto.Transaction{}, errors.New("Error creating new transaction in database")
 	}
-	transactionDto := dto.Transaction{ID: ID, AccountID: t.AccountID, OperationTypeID: t.OperationTypeID, Amount: t.Amount}
+	transactionDto, _ := transactionParser.ParseDomainToMessage(ID, t)
 	return transactionDto, nil
 }
 

@@ -17,3 +17,13 @@ func (ref AccountParser) ParseDomainToMessage(e entity.Account) (dto.Account, er
 	}
 	return account, nil
 }
+
+func (ref TransactionParser) ParseDomainToMessage(ID int64, t *dto.CreateTransaction) (dto.Transaction, error) {
+	transactionDto := dto.Transaction{
+		ID:              ID,
+		AccountID:       t.AccountID,
+		OperationTypeID: t.OperationTypeID,
+		Amount:          t.Amount,
+	}
+	return transactionDto, nil
+}
