@@ -22,3 +22,7 @@ func (ref *SqliteMock) CreateTransaction(transaction *dto.CreateTransaction) (in
 	args := ref.Called(transaction)
 	return args.Get(0).(int64), args.Error(1)
 }
+func (ref *SqliteMock) ClearUp() error {
+	args := ref.Called()
+	return args.Error(0)
+}
