@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"database/sql"
-
 	"github.com/Fuerback/transactions-go/dto"
 	"github.com/Fuerback/transactions-go/entity"
 )
@@ -13,8 +11,6 @@ type Repository interface {
 	CreateTransaction(transaction *dto.CreateTransaction) (int64, error)
 }
 
-func NewSqlite(db *sql.DB) Repository {
-	return &sqlite{
-		DB: db,
-	}
+func NewSqlite() Repository {
+	return &sqlite{}
 }

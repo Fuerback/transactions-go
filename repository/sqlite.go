@@ -2,18 +2,23 @@ package repository
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/Fuerback/transactions-go/dto"
 	"github.com/Fuerback/transactions-go/entity"
 )
 
-type sqlite struct {
-	DB *sql.DB
-}
+type sqlite struct{}
 
 func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
-	tx, err := s.DB.Begin()
+	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	tx, err := db.Begin()
 	if err != nil {
 		return 0, err
 	}
@@ -33,9 +38,15 @@ func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
 }
 
 func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
+	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	u := entity.Account{}
 
-	stmt, err := s.DB.Prepare("select * from account where id = ?")
+	stmt, err := db.Prepare("select * from account where id = ?")
 	if err != nil {
 		return entity.Account{}, err
 	}
@@ -49,7 +60,13 @@ func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
 }
 
 func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) (int64, error) {
-	tx, err := s.DB.Begin()
+	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	tx, err := db.Begin()
 	if err != nil {
 		return 0, err
 	}

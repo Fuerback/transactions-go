@@ -1,9 +1,7 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/Fuerback/transactions-go/controller"
@@ -16,12 +14,7 @@ import (
 const port string = ":8000"
 
 func main() {
-	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	sqliteRepo := repository.NewSqlite(db)
+	sqliteRepo := repository.NewSqlite()
 
 	httpRouter := router.NewMuxRouter()
 
