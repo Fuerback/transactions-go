@@ -16,7 +16,7 @@ import (
 const port string = ":8000"
 
 func main() {
-	db, err := sql.Open("sqlite3", "db/transaction.db")
+	db, err := sql.Open("sqlite3", "db/transaction.db?_foreign_keys=on")
 	if err != nil {
 		log.Fatal(err)
 	}

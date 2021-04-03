@@ -25,17 +25,17 @@ const (
 	PAGAMENTO
 )
 
-func GetOperation(i int) (string, error) {
+func IsNegative(i int) (bool, error) {
 	switch i {
 	case VISTA:
-		return "VISTA", nil
+		return true, nil
 	case PARCELADA:
-		return "PARCELADA", nil
+		return true, nil
 	case SAQUE:
-		return "SAQUE", nil
+		return true, nil
 	case PAGAMENTO:
-		return "PAGAMENTO", nil
+		return false, nil
 	default:
-		return "", errors.ErrInvalidOperation
+		return false, errors.ErrInvalidOperation
 	}
 }

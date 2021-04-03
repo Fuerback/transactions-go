@@ -30,10 +30,25 @@ func NewTransactionService(r repository.Repository) TransactionService {
 }
 
 func (s *transactionService) Create(t *dto.CreateTransaction) (dto.Transaction, error) {
+	err := s.transformAmountByOperationID(t)
+	if err != nil {
+		return dto.Transaction{}, err
+	}
 	ID, err := repo.CreateTransaction(t)
 	if err != nil {
 		return dto.Transaction{}, errors.New("Error creating new transaction in database")
 	}
 	transactionDto := dto.Transaction{ID: ID, AccountID: t.AccountID, OperationTypeID: t.OperationTypeID, Amount: t.Amount}
 	return transactionDto, nil
+}
+
+func (s *transactionService) transformAmountByOperationID(t *dto.CreateTransaction) error {
+	isNegative, err := entity.IsNegative(t.OperationTypeID)
+	if err != nil {
+		return err
+	}
+	if isNegative {
+		t.Amount = -t.Amount
+	}
+	return nil
 }
