@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -10,79 +9,81 @@ import (
 	e "github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/Fuerback/transactions-go/tests/mocks/repository"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/assert"
 )
 
 const documentNumber = "32451348003"
 
-type accountSuite struct {
-	suite.Suite
-	ctx     context.Context
-	service service.AccountService
-	repo    *repository.SqliteMock
+var (
+	accountService service.AccountService
+	repoAccount    *repository.SqliteMock
+)
+
+func init() {
+	repo = new(repository.SqliteMock)
+	accountService = service.NewAccountService(repo)
 }
 
-func TestAccountServer(t *testing.T) {
-	suite.Run(t, &accountSuite{
-		ctx: context.Background(),
-	})
-}
-
-func (ref *accountSuite) SetupTest() {
-	ref.repo = new(repository.SqliteMock)
-	ref.service = service.NewAccountService(ref.repo)
-}
-
-func (ref *accountSuite) TestCreateAccount_Success() {
+func TestCreateAccount_Success(t *testing.T) {
 	a := getCreateAccountDTO()
 
-	ref.repo.On("CreateAccount", a).Return(id, nil).Once()
+	repo.On("CreateAccount", a).Return(id, nil).Once()
 
-	account, err := ref.service.Create(a)
-	ref.NoError(err)
-	ref.NotNil(account)
-	ref.Equal(account.ID, id)
-	ref.Equal(account.DocumentNumber, documentNumber)
+	account, err := accountService.Create(a)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, account)
+	assert.NoError(t, err)
+	assert.Equal(t, id, account.ID)
+	assert.Equal(t, documentNumber, account.DocumentNumber)
 }
 
-func (ref *accountSuite) TestFindAccount_Success() {
+func TestFindAccount_Success(t *testing.T) {
 
-	ref.repo.On("FindAccount", id).Return(getAccount(), nil).Once()
+	repo.On("FindAccount", id).Return(getAccount(), nil).Once()
 
-	account, err := ref.service.Find(id)
-	ref.NoError(err)
-	ref.NotNil(account)
-	ref.Equal(account.ID, id)
-	ref.Equal(account.DocumentNumber, documentNumber)
+	account, err := accountService.Find(id)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, account)
+	assert.NoError(t, err)
+	assert.Equal(t, id, account.ID)
+	assert.Equal(t, documentNumber, account.DocumentNumber)
 }
 
-func (ref *accountSuite) TestDoNotFindAccount() {
+func TestDoNotFindAccount(t *testing.T) {
 
 	fakeErr := errors.New("some error")
-	ref.repo.On("FindAccount", id).Return(entity.Account{}, fakeErr).Once()
+	repo.On("FindAccount", id).Return(entity.Account{}, fakeErr).Once()
 
-	_, err := ref.service.Find(id)
-	ref.NotNil(err)
+	_, err := accountService.Find(id)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, err)
 }
 
-func (ref *accountSuite) TestCreateAccountInvalidDocumentNumber() {
+func TestCreateAccountInvalidDocumentNumber(t *testing.T) {
 	a := &dto.CreateAccount{
 		DocumentNumber: "documentNumber03973",
 	}
 
-	_, err := ref.service.Create(a)
-	ref.NotNil(err)
-	ref.Equal(err.Error(), e.ErrInvalidDocumentNumber.Error())
+	_, err := accountService.Create(a)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, err)
+	assert.Equal(t, e.ErrInvalidDocumentNumber.Error(), err.Error())
 }
 
-func (ref *accountSuite) TestCreateAccountErrorOnPersist() {
+func TestCreateAccountErrorOnPersist(t *testing.T) {
 	a := getCreateAccountDTO()
 
 	fakeErr := errors.New("some error")
-	ref.repo.On("CreateAccount", a).Return(id, fakeErr).Once()
+	repo.On("CreateAccount", a).Return(id, fakeErr).Once()
 
-	_, err := ref.service.Create(a)
-	ref.NotNil(err)
+	_, err := accountService.Create(a)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, err)
 }
 
 func getCreateAccountDTO() *dto.CreateAccount {

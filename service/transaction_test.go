@@ -1,100 +1,97 @@
 package service_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
 	"github.com/Fuerback/transactions-go/dto"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/Fuerback/transactions-go/tests/mocks/repository"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/assert"
 )
 
 const id int64 = 1
 
-type transactionSuite struct {
-	suite.Suite
-	ctx     context.Context
-	service service.TransactionService
-	repo    *repository.SqliteMock
+var (
+	transactionService service.TransactionService
+	repo               *repository.SqliteMock
+)
+
+func init() {
+	repo = new(repository.SqliteMock)
+	transactionService = service.NewTransactionService(repo)
 }
 
-func TestTransactionServer(t *testing.T) {
-	suite.Run(t, &transactionSuite{
-		ctx: context.Background(),
-	})
+func TestCreateTransaction_Success(t *testing.T) {
+	dto := getCreateTransactionDTO(2)
+
+	repo.On("CreateTransaction", dto).Return(id, nil).Once()
+
+	transaction, err := transactionService.Create(dto)
+
+	repo.AssertExpectations(t)
+	assert.NotNil(t, transaction)
+	assert.NoError(t, err)
+	assert.Equal(t, id, transaction.ID)
+	assert.Equal(t, id, transaction.AccountID)
 }
 
-func (ref *transactionSuite) SetupTest() {
-	ref.repo = new(repository.SqliteMock)
-	ref.service = service.NewTransactionService(ref.repo)
-}
-
-func (ref *transactionSuite) TestCreateTransaction_Success() {
-	t := getCreateTransactionDTO(2)
-
-	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
-
-	transaction, err := ref.service.Create(t)
-	ref.NoError(err)
-	ref.NotNil(transaction)
-	ref.Equal(transaction.ID, id)
-	ref.Equal(transaction.AccountID, id)
-	ref.Equal(transaction.AccountID, id)
-}
-
-func (ref *transactionSuite) TestCreateTransactionNegativeAmount_Success() {
+func TestCreateTransactionNegativeAmount_Success(t *testing.T) {
 
 	i := 1
 	for i <= 3 {
-		t := getCreateTransactionDTO(i)
+		dto := getCreateTransactionDTO(i)
 
-		ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+		repo.On("CreateTransaction", dto).Return(id, nil).Once()
 
-		transaction, err := ref.service.Create(t)
-		ref.NoError(err)
-		ref.NotNil(transaction)
-		ref.Equal(transaction.ID, id)
-		ref.Negative(transaction.Amount)
+		transaction, err := transactionService.Create(dto)
+
+		repo.AssertExpectations(t)
+		assert.NoError(t, err)
+		assert.NotNil(t, transaction)
+		assert.Equal(t, id, transaction.ID)
+		assert.Negative(t, transaction.Amount)
 		i++
 	}
 
 }
 
-func (ref *transactionSuite) TestCreateTransactionPositiveAmount_Success() {
+func TestCreateTransactionPositiveAmount_Success(t *testing.T) {
 
-	t := getCreateTransactionDTO(4)
+	dto := getCreateTransactionDTO(4)
 
-	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+	repo.On("CreateTransaction", dto).Return(id, nil).Once()
 
-	transaction, err := ref.service.Create(t)
-	ref.NoError(err)
-	ref.NotNil(transaction)
-	ref.Equal(transaction.ID, id)
-	ref.Positive(transaction.Amount)
+	transaction, err := transactionService.Create(dto)
+
+	repo.AssertExpectations(t)
+	assert.NoError(t, err)
+	assert.NotNil(t, transaction)
+	assert.Equal(t, id, transaction.ID)
+	assert.Positive(t, transaction.Amount)
 
 }
 
-func (ref *transactionSuite) TestCreateTransactionInvalidOperation() {
+func TestCreateTransactionInvalidOperation(t *testing.T) {
 
-	t := getCreateTransactionDTO(5)
+	dto := getCreateTransactionDTO(5)
 
-	ref.repo.On("CreateTransaction", t).Return(id, nil).Once()
+	_, err := transactionService.Create(dto)
 
-	_, err := ref.service.Create(t)
-	ref.Error(err)
+	assert.Error(t, err)
 }
 
-func (ref *transactionSuite) TestCreateTransactionErrorOnPersist() {
+func TestCreateTransactionErrorOnPersist(t *testing.T) {
 
-	t := getCreateTransactionDTO(1)
+	dto := getCreateTransactionDTO(1)
 	fakeErr := errors.New("some error")
 
-	ref.repo.On("CreateTransaction", t).Return(id, fakeErr).Once()
+	repo.On("CreateTransaction", dto).Return(id, fakeErr).Once()
 
-	_, err := ref.service.Create(t)
-	ref.Error(err)
+	_, err := transactionService.Create(dto)
+
+	repo.AssertExpectations(t)
+	assert.Error(t, err)
 }
 
 func getCreateTransactionDTO(operation int) *dto.CreateTransaction {
