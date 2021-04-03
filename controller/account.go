@@ -10,6 +10,7 @@ import (
 	"github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/gorilla/mux"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 var accountService service.AccountService
@@ -27,11 +28,19 @@ func NewAccountController(service service.AccountService) AccountController {
 }
 
 func (a *accountController) CreateAccount(resp http.ResponseWriter, r *http.Request) {
+	resp.Header().Set("Content-type", "application/json")
 	accountDTO := new(dto.CreateAccount)
 	err := json.NewDecoder(r.Body).Decode(accountDTO)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		resp.Write([]byte(`{"error": "error unmarshalling the request"}`))
+		return
+	}
+	v := validator.New()
+	err = v.Struct(accountDTO)
+	if err != nil {
+		resp.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
 	err = accountService.Create(accountDTO)
@@ -44,6 +53,8 @@ func (a *accountController) CreateAccount(resp http.ResponseWriter, r *http.Requ
 }
 
 func (a *accountController) FindAccount(resp http.ResponseWriter, r *http.Request) {
+	resp.Header().Set("Content-type", "application/json")
+
 	vars := mux.Vars(r)
 	ID, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
@@ -51,8 +62,6 @@ func (a *accountController) FindAccount(resp http.ResponseWriter, r *http.Reques
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
-
-	resp.Header().Set("Content-type", "application/json")
 	accounts, err := accountService.Find(ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
