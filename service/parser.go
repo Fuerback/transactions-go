@@ -10,7 +10,7 @@ type (
 	TransactionParser struct{}
 )
 
-func (ref AccountParser) ParseDomainToMessage(e entity.Account) (dto.Account, error) {
+func (ref AccountParser) ParseAccountEntityToAccountDTO(e entity.Account) (dto.Account, error) {
 	account := dto.Account{
 		ID:             e.ID,
 		DocumentNumber: e.DocumentNumber,
@@ -18,7 +18,15 @@ func (ref AccountParser) ParseDomainToMessage(e entity.Account) (dto.Account, er
 	return account, nil
 }
 
-func (ref TransactionParser) ParseDomainToMessage(ID int64, t *dto.CreateTransaction) (dto.Transaction, error) {
+func (ref AccountParser) ParseCreateAccountToAccount(ID int64, a *dto.CreateAccount) (dto.Account, error) {
+	account := dto.Account{
+		ID:             ID,
+		DocumentNumber: a.DocumentNumber,
+	}
+	return account, nil
+}
+
+func (ref TransactionParser) ParseCreateTransactionToTransaction(ID int64, t *dto.CreateTransaction) (dto.Transaction, error) {
 	transactionDto := dto.Transaction{
 		ID:              ID,
 		AccountID:       t.AccountID,

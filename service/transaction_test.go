@@ -20,7 +20,7 @@ type transactionSuite struct {
 	repo    *repository.SqliteMock
 }
 
-func TestHanlderServer(t *testing.T) {
+func TestTransactionServer(t *testing.T) {
 	suite.Run(t, &transactionSuite{
 		ctx: context.Background(),
 	})

@@ -1,7 +1,7 @@
 package dto
 
 type CreateAccount struct {
-	DocumentNumber string `json:"document_number" validate:"required"`
+	DocumentNumber string `json:"document_number" validate:"required,min=11,max=14"`
 }
 
 type Account struct {

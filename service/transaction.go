@@ -17,12 +17,7 @@ type transactionService struct{}
 var (
 	transactionParser TransactionParser
 	repo1             repository.Repository
-	transactions      []entity.Transaction
 )
-
-func init() {
-	transactions = []entity.Transaction{}
-}
 
 func NewTransactionService(r repository.Repository) TransactionService {
 	repo = r
@@ -38,7 +33,7 @@ func (s *transactionService) Create(t *dto.CreateTransaction) (dto.Transaction, 
 	if err != nil {
 		return dto.Transaction{}, errors.New("Error creating new transaction in database")
 	}
-	transactionDto, _ := transactionParser.ParseDomainToMessage(ID, t)
+	transactionDto, _ := transactionParser.ParseCreateTransactionToTransaction(ID, t)
 	return transactionDto, nil
 }
 
