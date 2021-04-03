@@ -43,13 +43,20 @@ func (a *accountController) CreateAccount(resp http.ResponseWriter, r *http.Requ
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
-	err = accountService.Create(accountDTO)
+	account, err := accountService.Create(accountDTO)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
+	result, err := json.Marshal(account)
+	if err != nil {
+		resp.WriteHeader(http.StatusInternalServerError)
+		resp.Write([]byte(`{"error": "error unmarshalling the account"}`))
+		return
+	}
 	resp.WriteHeader(http.StatusCreated)
+	resp.Write(result)
 }
 
 func (a *accountController) FindAccount(resp http.ResponseWriter, r *http.Request) {

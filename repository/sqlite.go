@@ -12,23 +12,24 @@ type sqlite struct {
 	DB *sql.DB
 }
 
-func (s *sqlite) CreateAccount(account *dto.CreateAccount) error {
+func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	stmt, err := tx.Prepare("insert into account(document_number) values (?)")
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(account.DocumentNumber)
+	result, err := stmt.Exec(account.DocumentNumber)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
+	ID, _ := result.LastInsertId()
 	tx.Commit()
-	return nil
+	return ID, nil
 }
 
 func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
@@ -47,21 +48,22 @@ func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
 	return u, nil
 }
 
-func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) error {
+func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) (int64, error) {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	stmt, err := tx.Prepare("insert into [transaction](account_id, amount, event_date, operation_type) values (?,?,?,?)")
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(transaction.AccountID, transaction.Amount, time.Now().Format(time.RFC3339), transaction.OperationTypeID)
+	result, err := stmt.Exec(transaction.AccountID, transaction.Amount, time.Now().Format(time.RFC3339), transaction.OperationTypeID)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
+	ID, _ := result.LastInsertId()
 	tx.Commit()
-	return nil
+	return ID, nil
 }

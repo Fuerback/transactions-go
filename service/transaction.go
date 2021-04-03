@@ -9,7 +9,7 @@ import (
 )
 
 type TransactionService interface {
-	Create(transaction *dto.CreateTransaction) error
+	Create(transaction *dto.CreateTransaction) (dto.Transaction, error)
 }
 
 type transactionService struct{}
@@ -29,10 +29,11 @@ func NewTransactionService(r repository.Repository) TransactionService {
 	return &transactionService{}
 }
 
-func (s *transactionService) Create(transaction *dto.CreateTransaction) error {
-	err := repo.CreateTransaction(transaction)
+func (s *transactionService) Create(t *dto.CreateTransaction) (dto.Transaction, error) {
+	ID, err := repo.CreateTransaction(t)
 	if err != nil {
-		return errors.New("Error creating new transaction in database")
+		return dto.Transaction{}, errors.New("Error creating new transaction in database")
 	}
-	return nil
+	transactionDto := dto.Transaction{ID: ID, AccountID: t.AccountID, OperationTypeID: t.OperationTypeID, Amount: t.Amount}
+	return transactionDto, nil
 }

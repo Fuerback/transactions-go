@@ -9,7 +9,7 @@ import (
 
 type AccountService interface {
 	Find(ID int64) (dto.Account, error)
-	Create(account *dto.CreateAccount) error
+	Create(account *dto.CreateAccount) (dto.Account, error)
 }
 
 type accountService struct{}
@@ -33,10 +33,11 @@ func (s *accountService) Find(ID int64) (dto.Account, error) {
 	return accountDTO, nil
 }
 
-func (s *accountService) Create(account *dto.CreateAccount) error {
-	err := repo.CreateAccount(account)
+func (s *accountService) Create(account *dto.CreateAccount) (dto.Account, error) {
+	ID, err := repo.CreateAccount(account)
 	if err != nil {
-		return errors.New("Error creating new account in database")
+		return dto.Account{}, errors.New("Error creating new account in database")
 	}
-	return nil
+	accountDto := dto.Account{ID: ID, DocumentNumber: account.DocumentNumber}
+	return accountDto, nil
 }

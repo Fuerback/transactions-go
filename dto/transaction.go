@@ -14,3 +14,10 @@ type CreateTransaction struct {
 	OperationTypeID int     `json:"operation_type_id" validate:"required"`
 	Amount          float64 `json:"amount" validate:"required"`
 }
+
+type Transaction struct {
+	ID              int64
+	AccountID       int
+	OperationTypeID int
+	Amount          float64
+}

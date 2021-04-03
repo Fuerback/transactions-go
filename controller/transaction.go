@@ -39,11 +39,18 @@ func (c *transactionController) CreateTransaction(resp http.ResponseWriter, r *h
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
-	err = transactionService.Create(transactionDTO)
+	transaction, err := transactionService.Create(transactionDTO)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err.Error()})
 		return
 	}
+	result, err := json.Marshal(transaction)
+	if err != nil {
+		resp.WriteHeader(http.StatusInternalServerError)
+		resp.Write([]byte(`{"error": "error unmarshalling the transaction"}`))
+		return
+	}
 	resp.WriteHeader(http.StatusCreated)
+	resp.Write(result)
 }

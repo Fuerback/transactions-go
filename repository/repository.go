@@ -8,9 +8,9 @@ import (
 )
 
 type Repository interface {
-	CreateAccount(account *dto.CreateAccount) error
+	CreateAccount(account *dto.CreateAccount) (int64, error)
 	FindAccount(ID int64) (entity.Account, error)
-	CreateTransaction(transaction *dto.CreateTransaction) error
+	CreateTransaction(transaction *dto.CreateTransaction) (int64, error)
 }
 
 func NewSqlite(db *sql.DB) Repository {
