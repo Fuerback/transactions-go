@@ -15,6 +15,10 @@ To run project locally you need to export the environment variable `PORT=:8000` 
 make run-local
 ```
 
+```shell
+make run-tests
+```
+
 ## Docker
 
 ```shell
@@ -23,13 +27,18 @@ make docker-image
 make docker-run
 ```
 
-The default PORT to test via Docker is `8080`
-
-## Tests
+or just
 
 ```shell
-make unit-test
-make integration-test
+make docker-up
+```
+
+The default PORT to test via Docker is `8080`
+
+to run **tests on Docker**:
+
+```shell
+make docker-tests
 ```
 
 # Usage
