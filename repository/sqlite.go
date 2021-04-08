@@ -5,15 +5,14 @@ import (
 	"log"
 	"time"
 
-	"github.com/Fuerback/transactions-go/dto"
-	"github.com/Fuerback/transactions-go/entity"
+	"github.com/Fuerback/transactions-go/domain"
 )
 
 type sqlite struct {
 	DBFilePath string
 }
 
-func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
+func (s *sqlite) CreateAccount(account *domain.CreateAccountDTO) (int64, error) {
 	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
@@ -39,29 +38,29 @@ func (s *sqlite) CreateAccount(account *dto.CreateAccount) (int64, error) {
 	return ID, nil
 }
 
-func (s *sqlite) FindAccount(ID int64) (entity.Account, error) {
+func (s *sqlite) FindAccount(ID int64) (domain.Account, error) {
 	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	u := entity.Account{}
+	u := domain.Account{}
 
 	stmt, err := db.Prepare("select * from account where id = ?")
 	if err != nil {
-		return entity.Account{}, err
+		return domain.Account{}, err
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(ID).Scan(&u.ID, &u.DocumentNumber)
 	if err != nil {
-		return entity.Account{}, err
+		return domain.Account{}, err
 	}
 
 	return u, nil
 }
 
-func (s *sqlite) CreateTransaction(transaction *dto.CreateTransaction) (int64, error) {
+func (s *sqlite) CreateTransaction(transaction *domain.CreateTransactionDTO) (int64, error) {
 	db, err := sql.Open("sqlite3", s.DBFilePath)
 	if err != nil {
 		log.Fatal(err)

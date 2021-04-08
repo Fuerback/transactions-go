@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/Fuerback/transactions-go/controller"
-	"github.com/Fuerback/transactions-go/dto"
+	"github.com/Fuerback/transactions-go/domain"
 	"github.com/Fuerback/transactions-go/repository"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/gorilla/mux"
@@ -116,7 +116,7 @@ func TestCreateAccount(t *testing.T) {
 			t.Errorf("Handler returned a wrong status code: got %v but want %v", status, http.StatusCreated)
 		}
 
-		var accountDTO dto.Account
+		var accountDTO domain.AccountDTO
 		json.NewDecoder(io.Reader(response.Body)).Decode(&accountDTO)
 
 		assert.NotNil(t, accountDTO.ID)
@@ -165,7 +165,7 @@ func TestCreatePositiveTransaction(t *testing.T) {
 			t.Errorf("Handler returned a wrong status code: got %v but want %v", status, http.StatusCreated)
 		}
 
-		var transactionDTO dto.Transaction
+		var transactionDTO domain.TransactionDTO
 		json.NewDecoder(io.Reader(response.Body)).Decode(&transactionDTO)
 
 		assert.NotNil(t, transactionDTO.ID)
@@ -193,7 +193,7 @@ func TestCreateNegativeTransaction(t *testing.T) {
 			t.Errorf("Handler returned a wrong status code: got %v but want %v", status, http.StatusCreated)
 		}
 
-		var transactionDTO dto.Transaction
+		var transactionDTO domain.TransactionDTO
 		json.NewDecoder(io.Reader(response.Body)).Decode(&transactionDTO)
 
 		assert.NotNil(t, transactionDTO.ID)

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Fuerback/transactions-go/dto"
+	"github.com/Fuerback/transactions-go/domain"
 	"github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
 	"gopkg.in/go-playground/validator.v9"
@@ -25,7 +25,7 @@ func NewTransactionController(service service.TransactionService) TransactionCon
 
 func (c *transactionController) CreateTransaction(resp http.ResponseWriter, r *http.Request) {
 	resp.Header().Set("Content-type", "application/json")
-	transactionDTO := new(dto.CreateTransaction)
+	transactionDTO := new(domain.CreateTransactionDTO)
 	err := json.NewDecoder(r.Body).Decode(transactionDTO)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)

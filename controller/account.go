@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Fuerback/transactions-go/dto"
+	"github.com/Fuerback/transactions-go/domain"
 	"github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/gorilla/mux"
@@ -29,7 +29,7 @@ func NewAccountController(service service.AccountService) AccountController {
 
 func (a *accountController) CreateAccount(resp http.ResponseWriter, r *http.Request) {
 	resp.Header().Set("Content-type", "application/json")
-	accountDTO := new(dto.CreateAccount)
+	accountDTO := new(domain.CreateAccountDTO)
 	err := json.NewDecoder(r.Body).Decode(accountDTO)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Fuerback/transactions-go/dto"
+	"github.com/Fuerback/transactions-go/domain"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/Fuerback/transactions-go/tests/mocks/repository"
 	"github.com/stretchr/testify/assert"
@@ -94,8 +94,8 @@ func TestCreateTransactionErrorOnPersist(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func getCreateTransactionDTO(operation int) *dto.CreateTransaction {
-	return &dto.CreateTransaction{
+func getCreateTransactionDTO(operation int) *domain.CreateTransactionDTO {
+	return &domain.CreateTransactionDTO{
 		AccountID:       id,
 		OperationTypeID: operation,
 		Amount:          120.56,

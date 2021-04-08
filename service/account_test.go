@@ -4,8 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Fuerback/transactions-go/dto"
-	"github.com/Fuerback/transactions-go/entity"
+	"github.com/Fuerback/transactions-go/domain"
 	e "github.com/Fuerback/transactions-go/errors"
 	"github.com/Fuerback/transactions-go/service"
 	"github.com/Fuerback/transactions-go/tests/mocks/repository"
@@ -54,7 +53,7 @@ func TestFindAccount_Success(t *testing.T) {
 func TestDoNotFindAccount(t *testing.T) {
 
 	fakeErr := errors.New("some error")
-	repo.On("FindAccount", id).Return(entity.Account{}, fakeErr).Once()
+	repo.On("FindAccount", id).Return(domain.Account{}, fakeErr).Once()
 
 	_, err := accountService.Find(id)
 
@@ -63,7 +62,7 @@ func TestDoNotFindAccount(t *testing.T) {
 }
 
 func TestCreateAccountInvalidDocumentNumber(t *testing.T) {
-	a := &dto.CreateAccount{
+	a := &domain.CreateAccountDTO{
 		DocumentNumber: "documentNumber03973",
 	}
 
@@ -86,14 +85,14 @@ func TestCreateAccountErrorOnPersist(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func getCreateAccountDTO() *dto.CreateAccount {
-	return &dto.CreateAccount{
+func getCreateAccountDTO() *domain.CreateAccountDTO {
+	return &domain.CreateAccountDTO{
 		DocumentNumber: documentNumber,
 	}
 }
 
-func getAccount() entity.Account {
-	return entity.Account{
+func getAccount() domain.Account {
+	return domain.Account{
 		ID:             id,
 		DocumentNumber: documentNumber,
 	}
